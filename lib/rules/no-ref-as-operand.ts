@@ -189,6 +189,7 @@ export default {
           )
           for (const { node } of tracker.iterateEsmReferences({
             pinia: {
+              [ReferenceTracker.ESM]: true,
               storeToRefs: {
                 [ReferenceTracker.CALL]: true
               }
