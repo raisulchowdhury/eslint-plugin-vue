@@ -8,6 +8,7 @@
     "new": "node tools/new-rule.js",
     "start": "npm run test:base -- --watch",
     "test:base": "vitest run --reporter=dot tests/lib",
+    "test:eslint-compat": "vitest run --reporter=dot tests/lib/rules",
     "test": "vitest run",
     "test:integrations": "vitest run tests/integrations",
     "debug": "vitest run --inspect --no-file-parallelism --reporter=dot tests/lib",
