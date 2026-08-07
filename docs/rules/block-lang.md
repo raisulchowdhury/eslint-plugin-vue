@@ -54,22 +54,17 @@ You can use the object as a value and use the following properties:
 - `lang` ... Specifies the available value for the `lang` attribute of the block. If multiple languages are available, specify them as an array. If you do not specify it, will disallow any language.
 - `allowNoLang` ... If `true`, allows the `lang` attribute not to be specified (allows the use of the default language of block).
 
-::: warning Note
-If the default language is specified for `lang` option of `<template>`, `<style>` and `<script>`, it will be enforced to not specify `lang` attribute.\
-This is to prevent unintended problems with [Vetur](https://vuejs.github.io/vetur/).
-
-See also [Vetur - Syntax Highlighting](https://vuejs.github.io/vetur/guide/highlighting.html).
-:::
+If you use Vetur and want to omit the default `lang` attribute, set `allowNoLang` to `true`.
 
 ### `{ script: { lang: 'js' } }`
 
-Same as `{ script: { allowNoLang: true } }`.
+Requires the `lang="js"` attribute.
 
 <eslint-code-block :rules="{'vue/block-lang': ['error', { script: { lang: 'js' } }]}">
 
 ```vue
 <!-- ✓ GOOD -->
-<script>
+<script lang="js">
 </script>
 ```
 
@@ -79,11 +74,13 @@ Same as `{ script: { allowNoLang: true } }`.
 
 ```vue
 <!-- ✗ BAD -->
-<script lang="js">
+<script>
 </script>
 ```
 
 </eslint-code-block>
+
+To allow either an explicit `lang="js"` attribute or no `lang` attribute, configure `{ script: { lang: 'js', allowNoLang: true } }`.
 
 ## :rocket: Version
 
