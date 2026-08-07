@@ -30,6 +30,8 @@ since: v7.0.0
 This rule reports cases where a ref is used incorrectly as an operand.\
 You must use `.value` to access the `Ref` value.
 
+The rule also recognizes refs destructured from Pinia's `storeToRefs()` when `storeToRefs` is imported from `pinia`.
+
 <eslint-code-block fix :rules="{'vue/no-ref-as-operand': ['error']}">
 
 ```vue
