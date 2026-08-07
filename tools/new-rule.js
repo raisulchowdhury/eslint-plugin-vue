@@ -139,7 +139,14 @@ Nothing.
 `
   )
 
-  cp.execSync(`code "${ruleFile}"`)
-  cp.execSync(`code "${testFile}"`)
-  cp.execSync(`code "${docFile}"`)
+  try {
+    cp.execSync(`code "${ruleFile}"`)
+    cp.execSync(`code "${testFile}"`)
+    cp.execSync(`code "${docFile}"`)
+  } catch {
+    logger.log('Rule files generated successfully. Open them in your preferred editor:')
+    logger.log(ruleFile)
+    logger.log(testFile)
+    logger.log(docFile)
+  }
 })(process.argv[2], process.argv[3])
