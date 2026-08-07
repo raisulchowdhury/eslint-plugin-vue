@@ -23,7 +23,7 @@ jobs:
       - name: Verify #2082
         run: |
           git checkout --force oss/2082-template-type-assertion-test
-          npm test -- tests/lib/rules/no-parsing-error-template-type-assertion.test.ts
+          npm test -- tests/lib/rules/no-parsing-error-typescript.test.ts
       - name: Verify #2136
         run: |
           git checkout --force oss/2136-pinia-store-to-refs
