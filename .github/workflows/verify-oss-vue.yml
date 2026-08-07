@@ -1,0 +1,52 @@
+name: Verify OSS Vue branches
+
+on:
+  pull_request:
+    branches: [master]
+    paths: [.github/trigger-oss-vue]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+      - name: Verify #2082
+        run: |
+          git checkout --force oss/2082-template-type-assertion-test
+          npm test -- tests/lib/rules/no-parsing-error-template-type-assertion.test.ts
+      - name: Verify #2136
+        run: |
+          git checkout --force oss/2136-pinia-store-to-refs
+          npm test -- tests/lib/rules/no-ref-as-operand-pinia.test.ts
+      - name: Verify #2190
+        run: |
+          git checkout --force oss/2190-slot-template-component
+          npm test -- tests/lib/rules/html-self-closing-special-elements.test.ts
+      - name: Verify #2606
+        run: |
+          git checkout --force oss/2606-block-lang-default-explicit
+          npm test -- tests/lib/rules/block-lang-explicit-default.test.ts
+      - name: Verify #2678
+        run: |
+          git checkout --force oss/2678-eslint-compat-script
+          npm run test:eslint-compat
+      - name: Verify #2781 without VS Code CLI
+        run: |
+          git checkout --force oss/2781-new-rule-without-vscode
+          node tools/new-rule.js oss-verification-rule 'OSS Verifier'
+          git reset --hard
+          git clean -fd
+      - name: Verify #2926
+        run: |
+          git checkout --force oss/2926-component-api-neutral-options
+          npm test -- tests/lib/rules/component-api-style-neutral-options.test.ts
