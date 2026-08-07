@@ -44,7 +44,11 @@ function parseOptions(options: any): Options {
  * Get the elementType of the given element.
  */
 function getElementType(node: VElement): keyof Options {
-  if (utils.isCustomComponent(node)) {
+  if (
+    utils.isCustomComponent(node) ||
+    node.name === 'slot' ||
+    node.name === 'template'
+  ) {
     return 'COMPONENT'
   }
   if (utils.isHtmlElementNode(node)) {
