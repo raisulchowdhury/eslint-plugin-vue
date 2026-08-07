@@ -7,7 +7,7 @@ import type {
   RefObjectReferences,
   RefObjectReferenceForIdentifier
 } from '../utils/ref-object-references.ts'
-import { findVariable } from '@eslint-community/eslint-utils'
+import { findVariable, ReferenceTracker } from '@eslint-community/eslint-utils'
 import { extractRefObjectReferences } from '../utils/ref-object-references.ts'
 import utils from '../utils/index.js'
 
@@ -74,6 +74,7 @@ export default {
   create(context: RuleContext) {
     let refReferences: RefObjectReferences
     const setupContexts = new Map()
+    const storeToRefsCalls = new Set<CallExpression>()
 
     /**
      * Collect identifier id
@@ -91,16 +92,41 @@ export default {
       }
     }
 
+    /**
+     * Checks whether the given identifier is destructured from Pinia's storeToRefs().
+     */
+    function isStoreToRefsReference(node: Identifier): boolean {
+      const variable = findVariable(utils.getScope(context, node), node)
+      if (!variable) {
+        return false
+      }
+      return variable.defs.some((def) => {
+        if (def.type !== 'Variable' || def.node.type !== 'VariableDeclarator') {
+          return false
+        }
+        return (
+          def.node.init?.type === 'CallExpression' &&
+          storeToRefsCalls.has(def.node.init)
+        )
+      })
+    }
+
     function reportIfRefWrapped(node: Identifier) {
       const data = refReferences.get(node)
-      if (!isRefInit(data)) {
+      let method: string | null = null
+      if (isRefInit(data)) {
+        method = data.method
+      } else if (isStoreToRefsReference(node)) {
+        method = 'storeToRefs'
+      }
+      if (!method) {
         return
       }
       context.report({
         node,
         messageId: 'requireDotValue',
         data: {
-          method: data.method
+          method
         },
         fix(fixer) {
           return fixer.insertTextAfter(node, '.value')
@@ -157,6 +183,21 @@ export default {
       {
         Program() {
           refReferences = extractRefObjectReferences(context)
+
+          const tracker = new ReferenceTracker(
+            utils.getScope(context, programNode)
+          )
+          for (const { node } of tracker.iterateEsmReferences({
+            pinia: {
+              storeToRefs: {
+                [ReferenceTracker.CALL]: true
+              }
+            }
+          })) {
+            if (node.type === 'CallExpression') {
+              storeToRefsCalls.add(node)
+            }
+          }
         },
         // if (refValue)
         'IfStatement>Identifier'(node: Identifier) {
